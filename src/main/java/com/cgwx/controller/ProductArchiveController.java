@@ -3,6 +3,7 @@ package com.cgwx.controller;
 import com.alibaba.fastjson.JSON;
 import com.cgwx.aop.result.Result;
 import com.cgwx.aop.result.ResultUtil;
+import com.cgwx.data.dto.UploadFileReturn;
 import com.cgwx.service.impl.IProductArchiveService;
 import com.cgwx.service.impl.IProductDownloadService;
 import com.cgwx.service.impl.LayerPublishService;
@@ -17,6 +18,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +64,6 @@ public class ProductArchiveController {
         System.out.println("收到文件下载请求！");
         String filePath = iProductDownloadService.getEntityFilePath(productId);
         iProductDownloadService.downloadFile(request,response,fileName,filePath);
-        //iProductArchiveService.getFileNameList(productId);//测试
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{filename:.+}")
@@ -86,7 +87,20 @@ public class ProductArchiveController {
     }
 
 
+    @RequestMapping(value = "/uploadThemeticProduct")
+    @CrossOrigin(methods = RequestMethod.POST)
+    @ResponseBody
+    public Result uploadThemeticProduct(@RequestParam(value = "file", required = true) MultipartFile file) throws Exception {
 
+        System.out.print("收到专题产品上传请求！");
+        UploadFileReturn uploadFileReturn = iProductArchiveService.uploadFile(file);
+        System.out.println(uploadFileReturn.getFileName());
+        System.out.println(uploadFileReturn.getFilePath());
+        String path = iProductArchiveService.unZip(uploadFileReturn.getFileName(), uploadFileReturn.getFilePath());
+        System.out.println("输入是："+path);
+        return ResultUtil.success(iProductArchiveService.getSecondaryFileStructure(path));
+
+    }
 
 
 }

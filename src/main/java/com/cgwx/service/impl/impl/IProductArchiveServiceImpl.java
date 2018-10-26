@@ -1,15 +1,13 @@
 package com.cgwx.service.impl.impl;
 
-//import com.cgwx.dao.PdmThematicProductInfoMapper;
-//import com.cgwx.data.dto.UploadFileReturn;
-//import com.cgwx.data.entity.PdmThematicProductInfo;
-
 import com.cgwx.dao.PdmInlayProductInfoMapper;
 import com.cgwx.dao.PdmOrthoProductInfoMapper;
 import com.cgwx.dao.PdmSubdivisionProductInfoMapper;
 import com.cgwx.dao.PdmThemeticProductInfoMapper;
 import com.cgwx.data.dto.DirectoryInfo;
 import com.cgwx.data.dto.SecondaryFileStructure;
+import com.cgwx.data.dto.UploadFileReturn;
+import com.cgwx.data.entity.PdmThemeticProductInfo;
 import com.cgwx.service.impl.IProductArchiveService;
 import com.cgwx.service.impl.IProductDownloadService;
 import com.sun.media.jai.codec.ImageCodec;
@@ -45,10 +43,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-//import javax.swing.text.Document;
-//import javax.xml.bind.Element;
-
-
 /**
  * Created by PanSN on 2018/9/5.
  */
@@ -71,253 +65,217 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     @Autowired
     PdmSubdivisionProductInfoMapper pdmSubdivisionProductInfoMapper;
 
-//    @Autowired
-//    PdmThematicProductInfoMapper pdmThematicProductInfoMapper;
-//
-//    @Override
-//    public UploadFileReturn uploadFile(MultipartFile file) {
-//        if (file.isEmpty()) {
-//            return null;
-//        }
-//        String fileName = file.getOriginalFilename();
-//        UploadFileReturn uploadFileReturn = new UploadFileReturn();
-//        String path = System.getProperty("user.dir") + "/专题产品";
-//        File dest = new File(path + "/" + fileName);
-//        System.out.println("文件保存路径为：" + dest.toString());
-//        if (!dest.getParentFile().exists()) { //判断文件父目录是否存在
-//            dest.getParentFile().mkdir();
-//        }
-//        try {
-//
-//            file.transferTo(dest); //保存文件
-//            uploadFileReturn.setFileName(dest.toString());
-//            uploadFileReturn.setFilePath(path);
-//            return uploadFileReturn;
-//
-//        } catch (IllegalStateException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//            return null;
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//            return null;
-//        }
-//
-//    }
 
-//    @Override
-//    public String unZip(String source, String dest) {
-//
-//        String password = "password";
-//        String xmlPath = "";
-//        int isExistJpg = 0;
-//        String tifPath = "";
-//
-//        System.out.println("解压中……");
-//        try {
-//            File zipFile = new File(source);
-//            ZipFile zFile = new ZipFile(zipFile);  // 首先创建ZipFile指向磁盘上的.zip文件
-////            zFile.setFileNameCharset("GBK");
-//            zFile.setFileNameCharset("UTF-8");//在GBK系统中需要设置
-//            File destDir = new File(dest);     // 解压目录
-//            if (zFile.isEncrypted()) {
-//                zFile.setPassword(password.toCharArray());  // 设置密码
-//            }
-//            zFile.extractAll(dest);      // 将文件抽出到解压目录(解压)
-//            List<FileHeader> headerList = zFile.getFileHeaders();
-//            List<File> extractedFileList = new ArrayList<File>();
-//            for (FileHeader fileHeader : headerList) {
-//                if (!fileHeader.isDirectory()) {
-//                    extractedFileList.add(new File(destDir, fileHeader.getFileName()));
-//                }
-//            }
-//
-//            File[] extractedFiles = new File[extractedFileList.size()];
-//            extractedFileList.toArray(extractedFiles);
-//            for (File f : extractedFileList) {
-//                String str = f.getAbsolutePath();
-//                System.out.println(f.getAbsolutePath() + "....");
-//                int index = str.indexOf('.');//注意一下啊
-//                if (str.substring(index + 1).equals("xml"))
-//                    xmlPath = f.getAbsolutePath();
-//                if (str.substring(index + 1).equals("jpg"))
-//                    isExistJpg = 1;
-//                if (str.substring(index + 1).equals("tif"))
-//                    tifPath = f.getAbsolutePath();
-//            }
-//            if (isExistJpg == 0)
-//                ZoomImg(changeTiftoJpg(tifPath));
-//
-//        } catch (ZipException e) {
-//            System.out.println("解压失败！");
-//        }
-//        return xmlPath;
-//    }
-//
-//    /**
-//     * 压缩
-//     *
-//     * @param srcFile 源目录
-//     * @param dest    要压缩的目录
-//     * @param passwd  密码 不是必填
-//     * @throws ZipException 异常
-//     */
-//    @Override
-//    public void zip(String srcFile, String dest, String passwd) {
-//        File srcfile = new File(srcFile);
-//
-//        //创建目标文件
-//        String destname = buildDestFileName(srcfile, dest);
-//        ZipParameters par = new ZipParameters();
-//        par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-//        par.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-//
-//        if (passwd != null) {
-//            par.setEncryptFiles(true);
-//            par.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
-//            par.setPassword(passwd.toCharArray());
-//        }
-//
-//        try {
-//            ZipFile zipfile = new ZipFile(destname);
-//            if (srcfile.isDirectory()) {
-//                zipfile.addFolder(srcfile, par);
-//            } else {
-//                zipfile.addFile(srcfile, par);
-//            }
-//        } catch (ZipException e) {
-//        }
-//    }
-//
-//    public static String buildDestFileName(File srcfile, String dest) {
-//        if (dest == null) {
-//            if (srcfile.isDirectory()) {
-//                dest = srcfile.getParent() + File.separator + srcfile.getName() + ".zip";
-//            } else {
-//                String filename = srcfile.getName().substring(0, srcfile.getName().lastIndexOf("."));
-//                dest = srcfile.getParent() + File.separator + filename + ".zip";
-//            }
-//        } else {
-//            createPath(dest);//路径的创建
-//            if (dest.endsWith(File.separator)) {
-//                String filename = "";
-//                if (srcfile.isDirectory()) {
-//                    filename = srcfile.getName();
-//                } else {
-//                    filename = srcfile.getName().substring(0, srcfile.getName().lastIndexOf("."));
-//                }
-//                dest += filename + ".zip";
-//            }
-//        }
-//        return dest;
-//    }
-//
-//    private static void createPath(String dest) {
-//        File destDir = null;
-//        if (dest.endsWith(File.separator)) {
-//            destDir = new File(dest);//给出的是路径时
-//        } else {
-//            destDir = new File(dest.substring(0, dest.lastIndexOf(File.separator)));
-//        }
-//
-//        if (!destDir.exists()) {
-//            destDir.mkdirs();
-//        }
-//    }
-//
+    @Override
+    public UploadFileReturn uploadFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            return null;
+        }
+        String fileName = file.getOriginalFilename();
+        UploadFileReturn uploadFileReturn = new UploadFileReturn();
+        String path = System.getProperty("user.dir") + "/专题产品";
+        File dest = new File(path + "/" + fileName);
+        System.out.println("文件保存路径为：" + dest.toString());
+        if (!dest.getParentFile().exists()) { //判断文件父目录是否存在
+            dest.getParentFile().mkdir();
+        }
+        try {
+
+            file.transferTo(dest); //保存文件
+            uploadFileReturn.setFileName(dest.toString());
+            uploadFileReturn.setFilePath(path);
+            return uploadFileReturn;
+
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override/*解压zip文件*/
+    public String unZip(String source, String dest) {
+
+        String password = "password";
+        System.out.println("解压中……");
+        try {
+            File zipFile = new File(source);
+            ZipFile zFile = new ZipFile(zipFile);
+//            zFile.setFileNameCharset("GBK");
+            zFile.setFileNameCharset("UTF-8");
+            File destDir = new File(dest);     // 解压目录
+            if (zFile.isEncrypted()) {
+                zFile.setPassword(password.toCharArray());  // 设置密码
+            }
+            zFile.extractAll(dest);      // 将文件抽出到解压目录(解压)
+            List<FileHeader> headerList = zFile.getFileHeaders();
+            List<File> extractedFileList = new ArrayList<File>();
+            for (FileHeader fileHeader : headerList) {
+                if (!fileHeader.isDirectory()) {
+                    extractedFileList.add(new File(destDir, fileHeader.getFileName()));
+                }
+            }
+            File[] extractedFiles = new File[extractedFileList.size()];
+            extractedFileList.toArray(extractedFiles);
+            for (File f : extractedFileList) {
+                System.out.println(f.getAbsolutePath() + "....");
+            }
+        } catch (ZipException e) {
+            System.out.println("解压失败！");
+        }
+
+        String unzipPath = source;
+        unzipPath = unzipPath.substring(0,unzipPath.indexOf('.'));
+        return unzipPath;
+    }
+
+    @Override/*压缩zip文件*/
+    public void zip(String srcFile, String dest, String passwd) {
+        File srcfile = new File(srcFile);
+
+        //创建目标文件
+        String destname = buildDestFileName(srcfile, dest);
+        ZipParameters par = new ZipParameters();
+        par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        par.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+
+        if (passwd != null) {
+            par.setEncryptFiles(true);
+            par.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+            par.setPassword(passwd.toCharArray());
+        }
+
+        try {
+            ZipFile zipfile = new ZipFile(destname);
+            if (srcfile.isDirectory()) {
+                zipfile.addFolder(srcfile, par);
+            } else {
+                zipfile.addFile(srcfile, par);
+            }
+        } catch (ZipException e) {
+        }
+    }
+    public static String buildDestFileName(File srcfile, String dest) {
+        if (dest == null) {
+            if (srcfile.isDirectory()) {
+                dest = srcfile.getParent() + File.separator + srcfile.getName() + ".zip";
+            } else {
+                String filename = srcfile.getName().substring(0, srcfile.getName().lastIndexOf("."));
+                dest = srcfile.getParent() + File.separator + filename + ".zip";
+            }
+        } else {
+            createPath(dest);//路径的创建
+            if (dest.endsWith(File.separator)) {
+                String filename = "";
+                if (srcfile.isDirectory()) {
+                    filename = srcfile.getName();
+                } else {
+                    filename = srcfile.getName().substring(0, srcfile.getName().lastIndexOf("."));
+                }
+                dest += filename + ".zip";
+            }
+        }
+        return dest;
+    }
+    public static void createPath(String dest) {
+        File destDir = null;
+        if (dest.endsWith(File.separator)) {
+            destDir = new File(dest);//给出的是路径时
+        } else {
+            destDir = new File(dest.substring(0, dest.lastIndexOf(File.separator)));
+        }
+
+        if (!destDir.exists()) {
+            destDir.mkdirs();
+        }
+    }
+
+    @Override
+    public void updateXml(Document document, PdmThemeticProductInfo pdmThemeticProductInfo) {
 
 
-//    @Override
-//    public String getFilePath(String productId) {
-//
-//        return pdmThematicProductInfoMapper.selectFilePathByProductId(productId);
-//    }
+        //取出这个元素
+        Element element = document.createElement("productData");
+        //添加属性
+        element.setAttribute("productId", "id1");
+        Element element_name = document.createElement("name");
+        element_name.setTextContent("2B");
+//         Element element_nianling = doc.createElement("nianling");
+//         element_nianling.setTextContent("23");
+//         Element element_jieshao = doc.createElement("jieshao");
+//         element_jieshao.setTextContent("gi sh");
+        element.appendChild(element_name);
+//         element.appendChild(element_nianling);
+//         element.appendChild(element_jieshao);
+        //添加这个元素
+        document.getDocumentElement().appendChild(element);
+    }
 
-//    @Override
-//    public void updateXml(Document document, PdmThematicProductInfo pdmThematicProductInfo) {
-//
-//
-//        //取出这个元素
-//        Element element = document.createElement("productData");
-//        //添加属性
-//        element.setAttribute("productId", "id1");
-//        Element element_name = document.createElement("name");
-//        element_name.setTextContent("2B");
-////         Element element_nianling = doc.createElement("nianling");
-////         element_nianling.setTextContent("23");
-////         Element element_jieshao = doc.createElement("jieshao");
-////         element_jieshao.setTextContent("gi sh");
-//        element.appendChild(element_name);
-////         element.appendChild(element_nianling);
-////         element.appendChild(element_jieshao);
-//        //添加这个元素
-//        document.getDocumentElement().appendChild(element);
-//    }
+    @Override/*更新xml*/
+    public void update(Document document, String fileName) {
+        try {
+            //创建一个TransformerFactory实例
+            TransformerFactory tff = TransformerFactory.newInstance();
+            //通过TransformerFactory 得到一个转换器
+            Transformer tf = tff.newTransformer();
+            //通过Transformer类的方法 transform(Source xmlSource, Result outputTarget)
+            //将 XML Source 转换为 Result。
+//            tf.transform(new DOMSource(document), new StreamResult("C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\专题产品\\长春市201309热岛效应\\长春热岛201607.xml"));
+            tf.transform(new DOMSource(document), new StreamResult(fileName));
+            System.out.println("写入完成！");
+        } catch (Exception e) {
+        }
+    }
 
-//    @Override
-//    public void update(Document document, String fileName) {
-//        try {
-//            //创建一个TransformerFactory实例
-//            TransformerFactory tff = TransformerFactory.newInstance();
-//            //通过TransformerFactory 得到一个转换器
-//            Transformer tf = tff.newTransformer();
-//            //通过Transformer类的方法 transform(Source xmlSource, Result outputTarget)
-//            //将 XML Source 转换为 Result。
-////            tf.transform(new DOMSource(document), new StreamResult("C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\专题产品\\长春市201309热岛效应\\长春热岛201607.xml"));
-//            tf.transform(new DOMSource(document), new StreamResult(fileName));
-//            System.out.println("写入完成！");
-//        } catch (Exception e) {
-//        }
-//    }
-//
-//    @Override
-//    public String changeTiftoJpg(String fileName) {
-//
-//        String jpgName = fileName.replace(".tif", ".jpg");
-//        try {
-//            RenderedOp src = JAI.create("fileLoad", fileName);
-//            OutputStream os = new FileOutputStream(jpgName);
-//            JPEGEncodeParam param = new JPEGEncodeParam();
-//            ImageEncoder enc = ImageCodec.createImageEncoder("JPEG", os, param);
-//            enc.encode(src);
-//            os.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return jpgName;
-//    }
-//
-//    @Override
-//    public String ZoomImg(String fileName) {
-//
-//        String thumbnailImg = fileName.replace(".jpg", "Thumbnail.jpg");
-//        try {
-//            FileInputStream fis = new FileInputStream(fileName);
-//            BufferedImage bfimg = ImageIO.read(fis);
-//            int width = new Double(bfimg.getWidth()).intValue();
-//            int height = new Double(bfimg.getHeight()).intValue();
-//            if (width < 500) return fileName;
-//            int newHeight = height / 5;
-//            int newWidth = width / 5;
-//            BufferedImage bufferImgOut = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_3BYTE_BGR);
-//            Graphics graphics = bufferImgOut.createGraphics();
-//            graphics.drawImage(bfimg.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
-//            ImageIO.write(bufferImgOut, "jpg", new File(thumbnailImg));
-//            fis.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();         //不可以直接缩放tif
-//        }
-//        File f = new File(fileName);
-//        f.delete();
-//        return thumbnailImg;
-//    }
-//
-//    @Override
-//    public String getUUId() {
-//        UUID uuid = UUID.randomUUID();
-//        return uuid.toString().replace("-", "");
-//    }
+    @Override/*生成缩略图*/
+    public String changeTiftoJpg(String fileName) {
+
+        String jpgName = fileName.replace(".tif", ".jpg");
+        try {
+            RenderedOp src = JAI.create("fileLoad", fileName);
+            OutputStream os = new FileOutputStream(jpgName);
+            JPEGEncodeParam param = new JPEGEncodeParam();
+            ImageEncoder enc = ImageCodec.createImageEncoder("JPEG", os, param);
+            enc.encode(src);
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jpgName;
+    }
+
+    @Override/*缩放img*/
+    public String ZoomImg(String fileName) {
+
+        String thumbnailImg = fileName.replace(".jpg", "Thumbnail.jpg");
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            BufferedImage bfimg = ImageIO.read(fis);
+            int width = new Double(bfimg.getWidth()).intValue();
+            int height = new Double(bfimg.getHeight()).intValue();
+            if (width < 500) return fileName;
+            int newHeight = height / 5;
+            int newWidth = width / 5;
+            BufferedImage bufferImgOut = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_3BYTE_BGR);
+            Graphics graphics = bufferImgOut.createGraphics();
+            graphics.drawImage(bfimg.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
+            ImageIO.write(bufferImgOut, "jpg", new File(thumbnailImg));
+            fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File f = new File(fileName);
+        f.delete();
+        return thumbnailImg;
+    }
+
+    @Override
+    public String getUUId() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString().replace("-", "");
+    }
 
     @Override /*分别获取每种高级产品的id*/
     public String getNextProductId(int productType) {
@@ -485,5 +443,5 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         }
 
     }
-//
+
 }
