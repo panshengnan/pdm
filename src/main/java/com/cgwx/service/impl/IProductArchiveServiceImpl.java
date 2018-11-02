@@ -1,15 +1,13 @@
-package com.cgwx.service.impl.impl;
+package com.cgwx.service.impl;
 
-import com.cgwx.dao.PdmInlayProductInfoMapper;
-import com.cgwx.dao.PdmOrthoProductInfoMapper;
-import com.cgwx.dao.PdmSubdivisionProductInfoMapper;
-import com.cgwx.dao.PdmThemeticProductInfoMapper;
+import com.cgwx.dao.*;
 import com.cgwx.data.dto.DirectoryInfo;
 import com.cgwx.data.dto.SecondaryFileStructure;
 import com.cgwx.data.dto.UploadFileReturn;
+import com.cgwx.data.entity.PdmArchiveCheckInfo;
 import com.cgwx.data.entity.PdmThemeticProductInfo;
-import com.cgwx.service.impl.IProductArchiveService;
-import com.cgwx.service.impl.IProductDownloadService;
+import com.cgwx.service.IProductArchiveService;
+import com.cgwx.service.IProductDownloadService;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
@@ -27,8 +25,6 @@ import org.w3c.dom.Element;
 import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -36,7 +32,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,6 +60,12 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     @Autowired
     PdmSubdivisionProductInfoMapper pdmSubdivisionProductInfoMapper;
 
+    @Autowired
+    PdmArchiveCheckInfoMapper pdmArchiveCheckInfoMapper;
+
+    @Autowired
+    PdmProductInfoMapper pdmProductInfoMapper;
+
 
     @Override
     public UploadFileReturn uploadFile(MultipartFile file) {
@@ -73,7 +74,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         }
         String fileName = file.getOriginalFilename();
         UploadFileReturn uploadFileReturn = new UploadFileReturn();
-        String path = System.getProperty("user.dir") + "/专题产品";
+        String path = System.getProperty("user.dir") + "/临时存储区";
         File dest = new File(path + "/" + fileName);
         System.out.println("文件保存路径为：" + dest.toString());
         if (!dest.getParentFile().exists()) { //判断文件父目录是否存在
@@ -344,7 +345,10 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         File file = new File(path);
         File[] tempList = file.listFiles();
         SecondaryFileStructure secondaryFileStructure = new SecondaryFileStructure();
+        String tempId = getUUId();
+        secondaryFileStructure.setTempId(tempId);
         List<DirectoryInfo> directoryInfoList = new ArrayList<DirectoryInfo>();
+        int count = 0;
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
                 String tmp = tempList[i].toString();
@@ -354,6 +358,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
             }
             if (tempList[i].isDirectory()) {
                 DirectoryInfo directoryInfo = new DirectoryInfo();
+                directoryInfo.setSingleTempId((count++)+"");
                 List<String> files2 = new ArrayList<String>();
                 String tmp = tempList[i].toString();
                 tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
@@ -373,6 +378,10 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         }
         secondaryFileStructure.setFile(files);
         secondaryFileStructure.setDirectory(directoryInfoList);
+        PdmArchiveCheckInfo pdmArchiveCheckInfo = new PdmArchiveCheckInfo();
+        pdmArchiveCheckInfo.setTemporaryPath(path);
+        pdmArchiveCheckInfo.setProductId(tempId);
+        pdmArchiveCheckInfoMapper.insert(pdmArchiveCheckInfo);
         return secondaryFileStructure;
     }
 
@@ -442,6 +451,24 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
         }
 
+    }
+
+    @Override/**/
+    public List<String> getClientNameList(String clientName){
+
+        return pdmProductInfoMapper.selectClientNameList(clientName);
+    }
+
+    @Override/**/
+    public List<String> getDeliverNameList(String deliverName){
+
+        return pdmProductInfoMapper.selectDeliverNameList(deliverName);
+    }
+
+    @Override/**/
+    public List<String> getProducerList(String producer){
+
+        return pdmProductInfoMapper.selectProducerList(producer);
     }
 
 }
